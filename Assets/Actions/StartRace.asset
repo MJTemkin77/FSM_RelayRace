@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: StartRace
   m_EditorClassIdentifier: 
   Direction: 0
-  State: 1
+  RaceState: 1
   TriggerState: 0

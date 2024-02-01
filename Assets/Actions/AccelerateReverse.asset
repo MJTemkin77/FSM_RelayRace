@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: AccelerateReverse
   m_EditorClassIdentifier: 
   Direction: 1
-  State: 2
-  TriggerState: 1
+  RaceState: 1
+  TriggerState: 0

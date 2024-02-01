@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ReachCenterForward
   m_EditorClassIdentifier: 
   Direction: 0
-  State: 3
+  RaceState: 3
   TriggerState: 0

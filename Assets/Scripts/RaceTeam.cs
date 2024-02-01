@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -40,6 +41,8 @@ public class RaceTeam : MonoBehaviour
     /// </summary>
     [SerializeField] float accelarationIncrement = .01f;
 
+    [SerializeField] float maxSpeed = 10;
+
     /// <summary>
     /// The stage of the race. At the beginning of the race and at each end the runners are waiting.
     /// </summary>
@@ -58,9 +61,34 @@ public class RaceTeam : MonoBehaviour
     /// </summary>
     void Update()
     {
-        if (nextRaceState != RaceState.Wait) 
+        Vector3 movement = Vector3.zero;
+        switch (nextRaceState)
         {
-            this.transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            case RaceState.Wait:
+                movement = Vector3.zero;
+                break;
+            case RaceState.Start:
+                movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
+                break;
+            case RaceState.Accelerate:
+                speed += accelarationIncrement;
+                speed = Mathf.Max(speed, maxSpeed);
+                Debug.Log($"Acceleration: Speed is now {speed}");
+                movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
+                break;
+            case RaceState.Steady:
+                movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
+                break;
+            case RaceState.Decelerate:
+                speed -= accelarationIncrement;
+                speed = Mathf.Min(speed, maxSpeed);
+                Debug.Log($"Deceleration: Speed is now {speed}");
+                movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
+                break;
+        }
+        if (movement != Vector3.zero) 
+        {
+            this.transform.Translate(movement * Time.deltaTime);
         }
     }
 
@@ -82,11 +110,14 @@ public class RaceTeam : MonoBehaviour
     /// <param name="other">The object that the runner has triggered.</param>
     private void OnTriggerEnter(Collider other)
     {
-        bool changedState =
-        GetNextRaceState(other, TriggerState.Enter);
-        if (changedState)
+        if (nextRaceState != RaceState.Wait)
         {
-            Debug.Log($"{this.name} has entered {other.name} and the race state has changed to {nextRaceState}");
+            bool changedState =
+            GetNextRaceState(other, TriggerState.Enter);
+            if (changedState)
+            {
+                Debug.Log($"{this.name} has entered {other.name} and the race state has changed to {nextRaceState}");
+            }
         }
 
     }
@@ -97,14 +128,13 @@ public class RaceTeam : MonoBehaviour
     /// <param name="other">The object that the runner has triggered.</param>
     private void OnTriggerExit(Collider other)
     {
+
         bool changedState =
         GetNextRaceState(other, TriggerState.Exit);
         if (changedState)
         {
             Debug.Log($"{this.name} has exited {other.name} and the race state has changed to {nextRaceState}");
         }
-
-
     }
 
 
