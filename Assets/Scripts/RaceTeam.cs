@@ -2,6 +2,7 @@ using Assets.Scripts;
 using UnityEngine;
 using TMPro;
 using UnityEditor.Search;
+using System.Runtime.Serialization.Json;
 
 /// <summary>
 /// The various direction states that the Race Team Member can move on the track 
@@ -58,7 +59,7 @@ public class RaceTeam : MonoBehaviour
     int numberOfRunners;
 
     /// <summary>
-    /// The current speed
+    /// The current speed.
     /// </summary>
     float speed = 1.0f;
 
@@ -98,7 +99,8 @@ public class RaceTeam : MonoBehaviour
             case RaceState.Accelerate:
                 speed += accelarationIncrement;
                 speed = Mathf.Max(speed, maxSpeed);
-                speed = Mathf.Min(speed, initialSpeed);
+                if (speed < initialSpeed)
+                    speed = initialSpeed;
                 Debug.Log($"Acceleration: Speed is now {speed}");
                 movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
                 break;
@@ -120,7 +122,7 @@ public class RaceTeam : MonoBehaviour
                     currentRunner++;
                     runnerLabel.text = (currentRunner + 1).ToString();
                     //this.runnerLabel.transform.Rotate(0, 180, 0);
-                    nextRaceState = RaceState.Start;
+                    nextRaceState = RaceState.Accelerate;
                 }
                 else
                 {
