@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Decelerate
   m_EditorClassIdentifier: 
   Direction: 0
-  State: 2
+  State: 4
   TriggerState: 1
