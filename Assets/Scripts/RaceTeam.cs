@@ -1,7 +1,7 @@
 using Assets.Scripts;
-using UnityEditor;
 using UnityEngine;
-
+using TMPro;
+using UnityEditor.Search;
 
 /// <summary>
 /// The various direction states that the Race Team Member can move on the track 
@@ -33,7 +33,8 @@ public class RaceTeam : MonoBehaviour
     /// <summary>
     /// Let the designer pick the base speed.
     /// </summary>  
-    [SerializeField] float speed = 1.0f;
+    [Range(2f, 100f)]
+    [SerializeField] float initialSpeed = 2.0f;
 
     /// <summary>
     /// Let the designer pick the amount to increment (boost) 
@@ -41,7 +42,27 @@ public class RaceTeam : MonoBehaviour
     /// </summary>
     [SerializeField] float accelarationIncrement = .01f;
 
+    /// <summary>
+    /// Maximum speed that the runner can reach
+    /// </summary>
     [SerializeField] float maxSpeed = 10;
+
+    /// <summary>
+    /// Direct reference to the child TextMeshPro Text item used to set the 
+    /// number of the runner.
+    /// </summary>
+    [SerializeField] TMPro.TMP_Text runnerLabel;
+
+    [SerializeField]
+    [Range(1, 20)]
+    int numberOfRunners;
+
+    /// <summary>
+    /// The current speed
+    /// </summary>
+    float speed = 1.0f;
+
+    int currentRunner = 0;
 
     /// <summary>
     /// The stage of the race. At the beginning of the race and at each end the runners are waiting.
@@ -56,6 +77,10 @@ public class RaceTeam : MonoBehaviour
     Direction direction = Direction.Forward;
 
 
+    private void Start()
+    {
+        speed = initialSpeed;
+    }
     /// <summary>
     /// The state machine is used to largely control the movement values based on the RaceState and Direction.
     /// </summary>
@@ -73,6 +98,7 @@ public class RaceTeam : MonoBehaviour
             case RaceState.Accelerate:
                 speed += accelarationIncrement;
                 speed = Mathf.Max(speed, maxSpeed);
+                speed = Mathf.Min(speed, initialSpeed);
                 Debug.Log($"Acceleration: Speed is now {speed}");
                 movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
                 break;
@@ -85,7 +111,31 @@ public class RaceTeam : MonoBehaviour
                 Debug.Log($"Deceleration: Speed is now {speed}");
                 movement = speed * (direction == Direction.Forward ? Vector3.forward : Vector3.back);
                 break;
+            case RaceState.ReverseDirection:
+                speed = initialSpeed;
+                direction = direction == Direction.Forward ? Direction.Reverse : Direction.Forward;
+                
+                if (currentRunner + 1 < numberOfRunners)
+                {
+                    currentRunner++;
+                    runnerLabel.text = (currentRunner + 1).ToString();
+                    //this.runnerLabel.transform.Rotate(0, 180, 0);
+                    nextRaceState = RaceState.Start;
+                }
+                else
+                {
+                    nextRaceState =RaceState.Stop;
+                }
+
+                break;
+            case RaceState.Stop:
+                movement = Vector3.zero;
+                break;
+            default:
+                break;
+
         }
+        Debug.Log($"Current State:{nextRaceState}");
         if (movement != Vector3.zero) 
         {
             this.transform.Translate(movement * Time.deltaTime);
@@ -110,15 +160,13 @@ public class RaceTeam : MonoBehaviour
     /// <param name="other">The object that the runner has triggered.</param>
     private void OnTriggerEnter(Collider other)
     {
-        if (nextRaceState != RaceState.Wait)
-        {
             bool changedState =
             GetNextRaceState(other, TriggerState.Enter);
             if (changedState)
             {
                 Debug.Log($"{this.name} has entered {other.name} and the race state has changed to {nextRaceState}");
             }
-        }
+     
 
     }
 
