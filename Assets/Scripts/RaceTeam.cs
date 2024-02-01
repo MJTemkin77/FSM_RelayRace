@@ -5,14 +5,14 @@ using UnityEngine;
 public enum Direction { Forward, Reverse, Stop };
 public enum RaceState { Wait, Start, Accelerate, Steady, Decelerate, ReverseDirection, Stop, Unintialized }
 
-public class Racer : MonoBehaviour
+public class RaceTeam : MonoBehaviour
 {
     /// <summary>
     /// Let the designer pick the speed
     /// </summary>
     [SerializeField] float speed = 1.0f;
 
-    RaceState nextRaceState;
+    RaceState nextRaceState = RaceState.Wait;
     /// <summary>
     /// 
     /// </summary>
@@ -26,10 +26,15 @@ public class Racer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (direction != Direction.Stop)
+        if (nextRaceState != RaceState.Wait) 
         {
             this.transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
+    }
+
+    public void StartRace()
+    {
+        nextRaceState = RaceState.Start;
     }
     private void OnTriggerEnter(Collider other)
     {
