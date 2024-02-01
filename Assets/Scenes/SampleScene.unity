@@ -381,7 +381,7 @@ GameObject:
   - component: {fileID: 912230242}
   m_Layer: 0
   m_Name: StartFinish
-  m_TagString: Untagged
+  m_TagString: Barrier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -509,7 +509,7 @@ MonoBehaviour:
   actionsByDirection:
   - {fileID: 11400000, guid: 41979590eb0c086499098f697cfe6770, type: 2}
   - {fileID: 11400000, guid: 660dceba4d7d4e342a7a95084d6041b1, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: b1e3251cdb7187048bd243701186bf18, type: 2}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,7 +618,7 @@ GameObject:
   - component: {fileID: 1588142585}
   m_Layer: 0
   m_Name: CenterLine
-  m_TagString: Untagged
+  m_TagString: Barrier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -637,7 +637,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionsByDirection:
   - {fileID: 11400000, guid: cc7a443497f10124287a79abcd2d3913, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 35cf43d2c686e7e4a91436abd9c7ade1, type: 2}
+  - {fileID: 11400000, guid: 45e6ac63bcc0d8b45afdfb922f282f88, type: 2}
+  - {fileID: 11400000, guid: 4e6672ad017ad7542849e705fccddbad, type: 2}
 --- !u!65 &1588142586
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1039,7 +1041,7 @@ GameObject:
   - component: {fileID: 1938774770}
   m_Layer: 0
   m_Name: OtherSideOfField
-  m_TagString: Untagged
+  m_TagString: Barrier
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

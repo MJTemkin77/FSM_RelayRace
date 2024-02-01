@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 public enum Direction { Forward, Reverse, Stop };
-public enum RaceState { Wait, Start, Accelerate, Steady, Decelerate, ReverseDirection, Stop }
+public enum RaceState { Wait, Start, Accelerate, Steady, Decelerate, ReverseDirection, Stop, Unintialized }
 
 public class Racer : MonoBehaviour
 {
@@ -12,7 +12,7 @@ public class Racer : MonoBehaviour
     /// </summary>
     [SerializeField] float speed = 1.0f;
 
-    ActionByDirection currentActionState;
+    RaceState nextRaceState;
     /// <summary>
     /// 
     /// </summary>
@@ -34,13 +34,12 @@ public class Racer : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log($"{this.name} has entered {other.name}");
-        currentActionState =
-        GetActionState(other, TriggerState.Enter);
+        nextRaceState = GetNextRaceState(other, TriggerState.Enter);
     }
     private void OnTriggerExit(Collider other)
     {
-        currentActionState =
-        GetActionState(other, TriggerState.Exit);
+        nextRaceState =
+        GetNextRaceState(other, TriggerState.Exit);
 
         
         Debug.Log($"{this.name} has exited {other.name}");
@@ -48,20 +47,19 @@ public class Racer : MonoBehaviour
     }
 
 
-    private ActionByDirection GetActionState(Collider other, TriggerState triggerState)
+    private RaceState GetNextRaceState(Collider other, TriggerState triggerState)
     {
-        ActionByDirection action = null;
+        RaceState nextRaceState = RaceState.Unintialized;
         if (other.CompareTag("Barrier"))
         {
             BarrierDetection barrierDetection = other.GetComponent<BarrierDetection>();
             if (barrierDetection != null)
             {
-                action = barrierDetection.GetCurrentAction(triggerState);
-                if (action != null)
-                    Debug.Log(action.ToString());
+                nextRaceState = barrierDetection.GetNextRaceState(triggerState, direction);
+                Debug.Log($"Next Race State is: {nextRaceState}");
             }
         }
-        return action;
+        return nextRaceState;
     }
 
 

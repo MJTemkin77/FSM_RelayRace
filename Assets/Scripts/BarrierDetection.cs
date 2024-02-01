@@ -8,22 +8,23 @@ public class BarrierDetection : MonoBehaviour
     [SerializeField] ActionByDirection[] actionsByDirection = new ActionByDirection[2];
 
 #nullable enable
-    public ActionByDirection? GetCurrentAction(TriggerState state)
+    public RaceState GetNextRaceState(TriggerState triggerState, Direction direction)
     {
-        ActionByDirection? actionByDirection = null;
+        RaceState nextRaceState = RaceState.Unintialized;
+        ActionByDirection match = new(RaceState.Unintialized, triggerState, direction);
 
         // Find the action based on the trigger
         bool fnd = false;
         for (int i = 0; i < actionsByDirection.Length && !fnd; i++)
         {
-            if (actionsByDirection[i].TriggerState == state)
+            if (actionsByDirection[i].IsMatchForUnitialized(match))
             {
                 fnd = true;
-                actionByDirection = actionsByDirection[i];
+                nextRaceState = actionsByDirection[i].RaceState;
             }
 
         }
-        return actionByDirection;
+        return nextRaceState;
     }
 #nullable disable
 }
