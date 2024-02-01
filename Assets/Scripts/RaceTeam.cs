@@ -2,28 +2,60 @@ using Assets.Scripts;
 using UnityEngine;
 
 
+/// <summary>
+/// The various direction states that the Race Team Member can move on the track 
+/// which are Forward, Reverse, or no movement (Stop)
+/// </summary>
 public enum Direction { Forward, Reverse, Stop };
+
+/// <summary>
+/// Each RaceState indicates a stage in the race.
+/// Wait - waiting for the start of the race
+/// Start - start the race
+/// Accelerate - continuously increase the running speed
+/// Steady - hold the running speed 
+/// Decelerate - slow down as quickly as possible
+/// ReverseDirection - go back to the other end of the track. This may involve changing runners.
+/// Uninitialized - Essentially no state.
+/// </summary>
 public enum RaceState { Wait, Start, Accelerate, Steady, Decelerate, ReverseDirection, Stop, Unintialized }
 
+
+/// <summary>
+/// Class manages a N-Member relay race team, which is typically four members.
+/// There will be one runner at a time for each team. 
+/// When the player reaches the other end a new runner will take their place.
+/// The race ends when the last player reaches the StartFinish line.
+/// </summary>
 public class RaceTeam : MonoBehaviour
 {
     /// <summary>
-    /// Let the designer pick the speed
-    /// </summary>
+    /// Let the designer pick the base speed.
+    /// </summary>  
     [SerializeField] float speed = 1.0f;
 
-    RaceState nextRaceState = RaceState.Wait;
     /// <summary>
-    /// 
+    /// Let the designer pick the amount to increment (boost) 
+    /// the runners speed by when accelerating.
+    /// </summary>
+    [SerializeField] float accelarationIncrement = .01f;
+
+    /// <summary>
+    /// The stage of the race. At the beginning of the race and at each end the runners are waiting.
+    /// </summary>
+    RaceState nextRaceState = RaceState.Wait;
+
+    /// <summary>
+    /// Which direction is the running moving: forward, reverse, or stop (no movement)
+    /// This variable along with speed and accelerationIncrement is used to control the amount and
+    /// direction of movement. The race starts in the forward direction.
     /// </summary>
     Direction direction = Direction.Forward;
 
-    void Start()
-    {
-        direction = Direction.Forward;
-    }
 
-    // Update is called once per frame
+    /// <summary>
+    /// The state machine is used to largely control the movement values based on the RaceState and Direction.
+    /// </summary>
     void Update()
     {
         if (nextRaceState != RaceState.Wait) 
@@ -32,39 +64,84 @@ public class RaceTeam : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Receives the Start Race button click to start the race.
+    /// </summary>
     public void StartRace()
     {
         nextRaceState = RaceState.Start;
     }
+
+
+    /// <summary>
+    /// The runner will encounter game objects used as triggers. 
+    /// The triggers provide the transition to the next Race State.
+    /// The next Race State is used by Update.
+    /// Both OnTriggerEnter and OnTriggerExit call a common method.
+    /// </summary>
+    /// <param name="other">The object that the runner has triggered.</param>
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"{this.name} has entered {other.name}");
-        nextRaceState = GetNextRaceState(other, TriggerState.Enter);
+        bool changedState =
+        GetNextRaceState(other, TriggerState.Enter);
+        if (changedState)
+        {
+            Debug.Log($"{this.name} has entered {other.name} and the race state has changed to {nextRaceState}");
+        }
+
     }
+
+    /// <summary>
+    /// See the above explanation.
+    /// </summary>
+    /// <param name="other">The object that the runner has triggered.</param>
     private void OnTriggerExit(Collider other)
     {
-        nextRaceState =
+        bool changedState =
         GetNextRaceState(other, TriggerState.Exit);
+        if (changedState)
+        {
+            Debug.Log($"{this.name} has exited {other.name} and the race state has changed to {nextRaceState}");
+        }
 
-        
-        Debug.Log($"{this.name} has exited {other.name}");
 
     }
 
 
-    private RaceState GetNextRaceState(Collider other, TriggerState triggerState)
+    /// <summary>
+    /// If a valid race state has been found then change the nextRaceState, class variable,
+    /// to the value of the local variable if the found race state is different than 
+    /// the current race state.
+    /// 
+    /// If a race state was not found then return false indicating that there is no change. 
+    /// True otherwise.
+    /// </summary>
+    /// <param name="other">The trigger object</param>
+    /// <param name="triggerState">What kind of trigger - Enter, Exit</param>
+    /// <returns>True if there is a change in the state.</returns>
+    private bool GetNextRaceState(Collider other, TriggerState triggerState)
     {
-        RaceState nextRaceState = RaceState.Unintialized;
+        RaceState raceState = RaceState.Unintialized;
         if (other.CompareTag("Barrier"))
         {
             BarrierDetection barrierDetection = other.GetComponent<BarrierDetection>();
             if (barrierDetection != null)
             {
-                nextRaceState = barrierDetection.GetNextRaceState(triggerState, direction);
-                Debug.Log($"Next Race State is: {nextRaceState}");
+                raceState = barrierDetection.GetNextRaceState(triggerState, direction);
+                Debug.Log($"Next Race State is: {raceState}");
             }
         }
-        return nextRaceState;
+
+        // Only change next race state if it is valid and different from the previous state.
+        if (raceState != RaceState.Unintialized && raceState != nextRaceState)
+        {
+            nextRaceState = raceState;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 
