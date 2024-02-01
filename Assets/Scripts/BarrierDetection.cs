@@ -1,17 +1,15 @@
 using Assets.Scripts;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BarrierDetection : MonoBehaviour
 {
-    [SerializeField] ActionByDirection[] actionsByDirection = new ActionByDirection[2];
+    [SerializeField] ActionByDirection[] actionsByDirection;// = new ActionByDirection[2];
 
-#nullable enable
     public RaceState GetNextRaceState(TriggerState triggerState, Direction direction)
     {
         RaceState nextRaceState = RaceState.Unintialized;
-        ActionByDirection match = new(RaceState.Unintialized, triggerState, direction);
+        ActionByDirection match = ScriptableObject.CreateInstance<ActionByDirection>().
+            SetValues(RaceState.Unintialized, triggerState, direction);
 
         // Find the action based on the trigger
         bool fnd = false;
@@ -26,5 +24,4 @@ public class BarrierDetection : MonoBehaviour
         }
         return nextRaceState;
     }
-#nullable disable
 }

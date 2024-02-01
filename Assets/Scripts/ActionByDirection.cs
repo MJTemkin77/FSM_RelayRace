@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -15,11 +13,12 @@ namespace Assets.Scripts
         private TriggerState state;
 
 
-        public ActionByDirection(RaceState raceState, TriggerState triggerState, Direction direction)
+        public ActionByDirection SetValues(RaceState raceState, TriggerState triggerState, Direction direction)
         {
             this.RaceState = raceState;
             this.state = triggerState;
             Direction = direction;
+            return this;
         }
 
         /// <summary>
